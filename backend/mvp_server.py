@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Force redeploy timestamp: 2024-06-04-22:30
 """
 MVP HTTP Server cho TikTok Video Generator
 Sử dụng http.server thay vì FastAPI
