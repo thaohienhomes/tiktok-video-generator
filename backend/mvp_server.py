@@ -58,14 +58,18 @@ class MVPHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         """Handle CORS preflight requests"""
+        logger.info(f"OPTIONS preflight request for {self.path}")
+        self.send_response(200)
         self.send_cors_headers()
         self.end_headers()
 
     def send_cors_headers(self):
-        """Add CORS headers"""
+        """Add comprehensive CORS headers"""
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With')
+        self.send_header('Access-Control-Max-Age', '86400')
+        self.send_header('Access-Control-Allow-Credentials', 'false')
 
     def do_GET(self):
         """Handle GET requests"""
@@ -422,14 +426,14 @@ class MVPHandler(BaseHTTPRequestHandler):
         try:
             json_data = json.dumps(data, indent=2)
             self.send_response(status_code)
-            self.send_cors_headers()
+            self.send_cors_headers()  # CORS headers for all responses
             self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.send_header('Content-Length', str(len(json_data.encode('utf-8'))))
             self.end_headers()
             self.wfile.write(json_data.encode('utf-8'))
-            logger.info(f"Sent JSON response: {json_data[:100]}...")
+            logger.info(f"✅ JSON response sent ({status_code}): {json_data[:100]}...")
         except Exception as e:
-            logger.error(f"Error sending JSON response: {e}")
+            logger.error(f"❌ Error sending JSON response: {e}")
             self.send_error(500, f"Response error: {str(e)}")
 
     def send_error_response(self, status_code, message):
