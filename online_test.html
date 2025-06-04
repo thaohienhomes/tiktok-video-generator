@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video Generator - Online Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .content { padding: 30px; }
+        .test-section { 
+            background: #f8f9fa; 
+            padding: 25px; 
+            border-radius: 15px; 
+            margin: 20px 0; 
+            border-left: 5px solid #4ECDC4;
+        }
+        .test-section h3 { 
+            color: #2c3e50; 
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .emoji { font-size: 24px; margin-right: 10px; }
+        input, select, button { 
+            padding: 12px 16px; 
+            margin: 8px 0; 
+            border: 2px solid #e9ecef; 
+            border-radius: 8px; 
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus { 
+            border-color: #4ECDC4; 
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+        button { 
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4); 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 15px 0; 
+            white-space: pre-wrap; 
+            border: 1px solid #e9ecef;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { border-left: 5px solid #28a745; background: #d4edda; }
+        .error { border-left: 5px solid #dc3545; background: #f8d7da; }
+        .loading { border-left: 5px solid #ffc107; background: #fff3cd; }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ok { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-loading { background: #ffc107; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 TikTok Video Generator</h1>
+            <p>AI-Powered Content to Video Converter</p>
+            <p><strong>Railway Demo:</strong> https://tiktok-video-generator-production-ea7b.up.railway.app</p>
+        </div>
+
+        <div class="content">
+            <!-- Health Check -->
+            <div class="test-section">
+                <h3><span class="emoji">📊</span>Health Check</h3>
+                <button onclick="testHealth()" id="healthBtn">Check Server Status</button>
+                <div id="healthResult" class="result"></div>
+            </div>
+
+            <!-- Process Content -->
+            <div class="test-section">
+                <h3><span class="emoji">🎯</span>Process Content</h3>
+                <input type="url" id="urlInput" placeholder="Enter URL (e.g., Wikipedia article)" 
+                       value="https://en.wikipedia.org/wiki/Artificial_intelligence">
+                
+                <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="useAI" checked> Use AI Analysis
+                    </label>
+                    <select id="voiceStyle">
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="calm">Calm</option>
+                    </select>
+                    <select id="duration">
+                        <option value="60">60 seconds</option>
+                        <option value="90">90 seconds</option>
+                        <option value="120">2 minutes</option>
+                        <option value="180">3 minutes</option>
+                    </select>
+                </div>
+                
+                <button onclick="processContent()" id="processBtn">🚀 Generate TikTok Video</button>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="processResult" class="result"></div>
+            </div>
+
+            <!-- Job Status -->
+            <div class="test-section">
+                <h3><span class="emoji">🔍</span>Job Status & Download</h3>
+                <input type="text" id="jobIdInput" placeholder="Job ID (auto-filled after processing)">
+                <button onclick="checkJobStatus()" id="statusBtn">Check Status</button>
+                <div id="jobResult" class="result"></div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="test-section">
+                <h3><span class="emoji">📖</span>How to Use</h3>
+                <ol style="line-height: 1.8;">
+                    <li><strong>Health Check:</strong> Verify server is running and AI services are enabled</li>
+                    <li><strong>Process Content:</strong> Enter a URL (Wikipedia, Medium, blog) and generate video</li>
+                    <li><strong>Monitor Progress:</strong> Job ID will auto-fill, check status periodically</li>
+                    <li><strong>Download:</strong> When completed, download link will appear</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://tiktok-video-generator-production-ea7b.up.railway.app';
+        let currentJobId = null;
+        let statusInterval = null;
+
+        function setStatus(elementId, message, type = 'loading') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        function setResult(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            if (typeof data === 'object') {
+                element.textContent = JSON.stringify(data, null, 2);
+            } else {
+                element.textContent = data;
+            }
+        }
+
+        async function testHealth() {
+            const btn = document.getElementById('healthBtn');
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+            
+            setStatus('healthResult', '🔄 Checking server health...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setResult('healthResult', data, 'success');
+                    
+                    // Show AI services status
+                    if (data.ai_services) {
+                        setStatus('healthResult', `✅ Server healthy! AI services: ENABLED\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                    } else {
+                        setStatus('healthResult', `⚠️ Server healthy but AI services: DISABLED\n\n${JSON.stringify(data, null, 2)}`, 'loading');
+                    }
+                } else {
+                    setResult('healthResult', data, 'error');
+                }
+            } catch (error) {
+                setResult('healthResult', `❌ Connection failed: ${error.message}`, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Check Server Status';
+        }
+
+        async function processContent() {
+            const btn = document.getElementById('processBtn');
+            const url = document.getElementById('urlInput').value;
+            const useAI = document.getElementById('useAI').checked;
+            const voiceStyle = document.getElementById('voiceStyle').value;
+            const duration = parseInt(document.getElementById('duration').value);
+
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            setStatus('processResult', '🚀 Starting content processing...');
+            
+            const payload = {
+                url: url,
+                content_type: "url",
+                use_ai: useAI,
+                settings: {
+                    duration: duration,
+                    voice_style: voiceStyle,
+                    language: "en"
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/process`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentJobId = data.job_id;
+                    document.getElementById('jobIdInput').value = currentJobId;
+                    
+                    setResult('processResult', data, 'success');
+                    
+                    // Start monitoring progress
+                    startProgressMonitoring();
+                } else {
+                    setResult('processResult', data, 'error');
+                }
+            } catch (error) {
+                setResult('processResult', `❌ Request failed: ${error.message}`, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate TikTok Video';
+        }
+
+        async function checkJobStatus() {
+            const jobId = document.getElementById('jobIdInput').value || currentJobId;
+            
+            if (!jobId) {
+                alert('Please enter Job ID');
+                return;
+            }
+
+            setStatus('jobResult', '🔍 Checking job status...');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/job/${jobId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setResult('jobResult', data, 'success');
+                    
+                    // Update progress bar
+                    updateProgress(data.progress || 0);
+                    
+                    if (data.status === 'completed') {
+                        setStatus('jobResult', `🎉 Video completed!\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                        stopProgressMonitoring();
+                    } else if (data.status === 'failed') {
+                        setStatus('jobResult', `❌ Processing failed: ${data.error}`, 'error');
+                        stopProgressMonitoring();
+                    }
+                } else {
+                    setResult('jobResult', data, 'error');
+                }
+            } catch (error) {
+                setResult('jobResult', `❌ Status check failed: ${error.message}`, 'error');
+            }
+        }
+
+        function updateProgress(percent) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            progressBar.style.display = 'block';
+            progressFill.style.width = `${percent}%`;
+        }
+
+        function startProgressMonitoring() {
+            if (statusInterval) clearInterval(statusInterval);
+            
+            statusInterval = setInterval(() => {
+                if (currentJobId) {
+                    checkJobStatus();
+                }
+            }, 3000); // Check every 3 seconds
+        }
+
+        function stopProgressMonitoring() {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+                statusInterval = null;
+            }
+        }
+
+        // Auto-check health on page load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 1000);
+        });
+    </script>
+</body>
+</html> 
