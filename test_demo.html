@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video Generator - Railway Demo Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 10px 0; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 300px; }
+        #result { background: #fff; padding: 15px; border-radius: 5px; margin: 10px 0; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🎬 TikTok Video Generator - Railway Demo</h1>
+    
+    <div class="container">
+        <h3>📊 Health Check</h3>
+        <button onclick="testHealth()">Test Health</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="container">
+        <h3>🎯 Process Content</h3>
+        <input type="url" id="urlInput" placeholder="https://example.com" value="https://en.wikipedia.org/wiki/Artificial_intelligence">
+        <br>
+        <label>
+            <input type="checkbox" id="useAI" checked> Use AI Analysis
+        </label>
+        <br>
+        <button onclick="processContent()">Process URL</button>
+        <div id="processResult"></div>
+    </div>
+
+    <div class="container">
+        <h3>🔍 Check Job Status</h3>
+        <input type="text" id="jobIdInput" placeholder="Job ID">
+        <button onclick="checkJobStatus()">Check Status</button>
+        <div id="jobResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://tiktok-video-generator-production-ea7b.up.railway.app';
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('healthResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('healthResult').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function processContent() {
+            const url = document.getElementById('urlInput').value;
+            const useAI = document.getElementById('useAI').checked;
+            
+            const payload = {
+                url: url,
+                content_type: "url",
+                use_ai: useAI,
+                settings: {
+                    duration: 60,
+                    voice_style: "professional"
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/process`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                document.getElementById('processResult').textContent = JSON.stringify(data, null, 2);
+                
+                // Auto-fill job ID if available
+                if (data.job_id) {
+                    document.getElementById('jobIdInput').value = data.job_id;
+                }
+            } catch (error) {
+                document.getElementById('processResult').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function checkJobStatus() {
+            const jobId = document.getElementById('jobIdInput').value;
+            if (!jobId) {
+                alert('Please enter Job ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/job/${jobId}`);
+                const data = await response.json();
+                document.getElementById('jobResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('jobResult').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 
