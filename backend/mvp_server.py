@@ -468,5 +468,11 @@ def run_mvp_server(host='127.0.0.1', port=8005):
         raise
 
 if __name__ == "__main__":
+    import os
     print("🔧 Starting TikTok Video Generator MVP Server...")
-    run_mvp_server() 
+    
+    # Get port from environment (Railway sets PORT automatically)
+    port = int(os.environ.get('PORT', 8005))
+    host = os.environ.get('HOST', '0.0.0.0')  # Railway needs 0.0.0.0
+    
+    run_mvp_server(host=host, port=port) 
