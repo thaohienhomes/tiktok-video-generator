@@ -127,7 +127,7 @@ class MVPHandler(BaseHTTPRequestHandler):
         response_data = {
             "message": "TikTok Video Generator API",
             "status": "running",
-            "server": "http_mvp",
+            "server": "enhanced_mvp_v2_cors_fixed",
             "version": "1.0.0",
             "endpoints": {
                 "GET /": "API info",
