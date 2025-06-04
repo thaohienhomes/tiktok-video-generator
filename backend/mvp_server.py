@@ -58,10 +58,19 @@ class MVPHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         """Handle CORS preflight requests"""
-        logger.info(f"OPTIONS preflight request for {self.path}")
+        logger.info(f"🔧 OPTIONS preflight request for {self.path}")
+        
+        # Send proper CORS preflight response
         self.send_response(200)
-        self.send_cors_headers()
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With, X-HTTP-Method-Override')
+        self.send_header('Access-Control-Max-Age', '86400')
+        self.send_header('Access-Control-Allow-Credentials', 'false')
+        self.send_header('Content-Length', '0')
         self.end_headers()
+        
+        logger.info(f"✅ CORS preflight response sent for {self.path}")
 
     def send_cors_headers(self):
         """Add comprehensive CORS headers"""
@@ -437,7 +446,7 @@ class MVPHandler(BaseHTTPRequestHandler):
             self.send_error(500, f"Response error: {str(e)}")
 
     def send_error_response(self, status_code, message):
-        """Send error response"""
+        """Send error response with CORS headers"""
         error_data = {
             "error": True,
             "status_code": status_code,
