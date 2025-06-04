@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video Generator - Live Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        .content { padding: 40px; }
+        .demo-section { 
+            background: #f8f9fa; 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin: 25px 0; 
+            border-left: 6px solid #4ECDC4;
+        }
+        .demo-section h3 { 
+            color: #2c3e50; 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.4rem;
+        }
+        .emoji { font-size: 28px; margin-right: 15px; }
+        input, select, button { 
+            padding: 15px 20px; 
+            margin: 10px 0; 
+            border: 2px solid #e9ecef; 
+            border-radius: 10px; 
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus { 
+            border-color: #4ECDC4; 
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+        }
+        button { 
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4); 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .result { 
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            white-space: pre-wrap; 
+            border: 1px solid #e9ecef;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success { border-left: 6px solid #28a745; background: #d4edda; }
+        .error { border-left: 6px solid #dc3545; background: #f8d7da; }
+        .loading { border-left: 6px solid #ffc107; background: #fff3cd; }
+        .controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        @media (max-width: 768px) {
+            .controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 TikTok Video Generator</h1>
+            <p>AI-Powered Content to Video Converter</p>
+            <div class="status-badge" id="serverStatus">
+                🔄 Checking server status...
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Server Status -->
+            <div class="demo-section">
+                <h3><span class="emoji">📊</span>Server Health Check</h3>
+                <button onclick="checkServerHealth()" id="healthBtn">Check Server Status</button>
+                <div id="healthResult" class="result"></div>
+            </div>
+
+            <!-- Generate Video -->
+            <div class="demo-section">
+                <h3><span class="emoji">🎯</span>Generate TikTok Video</h3>
+                
+                <input type="url" id="urlInput" 
+                       placeholder="Enter article URL (Wikipedia, Medium, blogs...)" 
+                       value="https://en.wikipedia.org/wiki/Artificial_intelligence">
+                
+                <div class="controls">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="useAI" checked> Use AI Analysis
+                    </label>
+                    <select id="voiceStyle">
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="calm">Calm</option>
+                    </select>
+                    <select id="duration">
+                        <option value="60">60 seconds</option>
+                        <option value="90">90 seconds</option>
+                        <option value="120">2 minutes</option>
+                        <option value="180">3 minutes</option>
+                    </select>
+                </div>
+                
+                <button onclick="generateVideo()" id="generateBtn">🚀 Generate TikTok Video</button>
+                <div id="generateResult" class="result"></div>
+            </div>
+
+            <!-- Job Status -->
+            <div class="demo-section">
+                <h3><span class="emoji">🔍</span>Monitor Progress</h3>
+                <input type="text" id="jobIdInput" placeholder="Job ID (auto-filled)">
+                <button onclick="checkJobStatus()" id="statusBtn">Check Status</button>
+                <div id="statusResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://tiktok-video-generator-production-ea7b.up.railway.app';
+        let currentJobId = null;
+
+        function setStatus(elementId, message, type = 'loading') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `result ${type}`;
+                element.textContent = message;
+            }
+        }
+
+        function setResult(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `result ${type}`;
+                element.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+            }
+        }
+
+        function updateServerStatus(status, type = 'loading') {
+            const statusBadge = document.getElementById('serverStatus');
+            if (statusBadge) {
+                statusBadge.textContent = status;
+                statusBadge.style.background = 
+                    type === 'success' ? 'rgba(40, 167, 69, 0.8)' : 
+                    type === 'error' ? 'rgba(220, 53, 69, 0.8)' : 
+                    'rgba(255, 193, 7, 0.8)';
+            }
+        }
+
+        async function checkServerHealth() {
+            const btn = document.getElementById('healthBtn');
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+            
+            setStatus('healthResult', '🔄 Connecting to server...');
+            updateServerStatus('🔄 Checking...', 'loading');
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setResult('healthResult', data, 'success');
+                    
+                    if (data.ai_services) {
+                        updateServerStatus('✅ Online • AI Enabled', 'success');
+                    } else {
+                        updateServerStatus('⚠️ Online • AI Disabled', 'loading');
+                    }
+                } else {
+                    setResult('healthResult', data, 'error');
+                    updateServerStatus('❌ Server Error', 'error');
+                }
+            } catch (error) {
+                setResult('healthResult', `❌ Connection failed: ${error.message}`, 'error');
+                updateServerStatus('❌ Connection Failed', 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Check Server Status';
+        }
+
+        async function generateVideo() {
+            const btn = document.getElementById('generateBtn');
+            const url = document.getElementById('urlInput').value;
+            const useAI = document.getElementById('useAI').checked;
+            const voiceStyle = document.getElementById('voiceStyle').value;
+            const duration = parseInt(document.getElementById('duration').value);
+
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            setStatus('generateResult', '🚀 Starting video generation...');
+            
+            const payload = {
+                url: url,
+                content_type: "url",
+                use_ai: useAI,
+                settings: {
+                    duration: duration,
+                    voice_style: voiceStyle,
+                    language: "en"
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/process`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentJobId = data.job_id;
+                    document.getElementById('jobIdInput').value = currentJobId;
+                    setResult('generateResult', data, 'success');
+                } else {
+                    setResult('generateResult', data, 'error');
+                }
+            } catch (error) {
+                setResult('generateResult', `❌ Request failed: ${error.message}`, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate TikTok Video';
+        }
+
+        async function checkJobStatus() {
+            const jobId = document.getElementById('jobIdInput').value || currentJobId;
+            
+            if (!jobId) {
+                alert('Please enter a Job ID');
+                return;
+            }
+
+            setStatus('statusResult', '🔍 Checking status...');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/job/${jobId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setResult('statusResult', data, 'success');
+                } else {
+                    setResult('statusResult', data, 'error');
+                }
+            } catch (error) {
+                setResult('statusResult', `❌ Failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-initialize
+        window.addEventListener('load', () => {
+            setTimeout(checkServerHealth, 1000);
+        });
+    </script>
+</body>
+</html> 

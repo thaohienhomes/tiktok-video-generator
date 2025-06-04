@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TikTok Generator Test</title>
+</head>
+<body>
+    <h1>🎬 TikTok Video Generator Test</h1>
+    
+    <button onclick="testHealth()">Test Health</button>
+    <button onclick="testGenerate()">Test Generate</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 20px; background: #f0f0f0;"></div>
+
+    <script>
+        const API_BASE = 'https://tiktok-video-generator-production-ea7b.up.railway.app';
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>✅ Health Check Success</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>❌ Health Check Failed</h3><p>${error.message}</p>`;
+            }
+        }
+        
+        async function testGenerate() {
+            try {
+                const response = await fetch(`${API_BASE}/api/process`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        url: "https://en.wikipedia.org/wiki/Artificial_intelligence",
+                        content_type: "url",
+                        use_ai: true,
+                        settings: {
+                            duration: 60,
+                            voice_style: "professional",
+                            language: "en"
+                        }
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>🚀 Generate Success</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>❌ Generate Failed</h3><p>${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

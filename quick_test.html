@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick API Test</title>
+</head>
+<body>
+    <h1>🔧 Debug CORS Issue</h1>
+    <button onclick="testCORS()">Test CORS</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Test 1: Health check (GET)
+                const healthResponse = await fetch('https://tiktok-video-generator-production-ea7b.up.railway.app/health');
+                const healthData = await healthResponse.json();
+                
+                resultDiv.innerHTML += `<h3>✅ GET /health: OK</h3>`;
+                
+                // Test 2: Process (POST)  
+                const processResponse = await fetch('https://tiktok-video-generator-production-ea7b.up.railway.app/api/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url: "https://en.wikipedia.org/wiki/Artificial_intelligence",
+                        content_type: "url",
+                        use_ai: true,
+                        settings: {
+                            duration: 60,
+                            voice_style: "professional",
+                            language: "en"
+                        }
+                    })
+                });
+                
+                if (processResponse.ok) {
+                    const processData = await processResponse.json();
+                    resultDiv.innerHTML += `<h3>✅ POST /api/process: OK</h3><pre>${JSON.stringify(processData, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML += `<h3>❌ POST failed: ${processResponse.status}</h3>`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<h3>❌ Error: ${error.message}</h3>`;
+                console.error('Detailed error:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

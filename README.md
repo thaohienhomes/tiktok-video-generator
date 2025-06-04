@@ -142,4 +142,115 @@ MIT License - xem file LICENSE để biết chi tiết.
 
 ## 🙋‍♂️ Hỗ trợ
 
-Nếu gặp vấn đề, vui lòng tạo issue trên GitHub. 
+Nếu gặp vấn đề, vui lòng tạo issue trên GitHub.
+
+## 🌟 Features
+
+- **AI Content Analysis**: Extract key insights from articles and blogs
+- **Script Generation**: Create viral-optimized scripts for TikTok format
+- **Voice Synthesis**: Natural voiceover using ElevenLabs AI
+- **Video Production**: Automated MP4 generation ready for upload
+- **Multi-Language**: Support for Vietnamese and English
+- **Real-time Processing**: Job queue with progress tracking
+
+## 🚀 Live Demo
+
+**Hosted Demo**: https://yourusername.github.io/your-repo-name/
+
+### Local Testing:
+```bash
+cd docs
+python -m http.server 3000
+# Open http://localhost:3000
+```
+
+## 📋 Deployment
+
+### 1. Railway Backend
+```bash
+railway deploy
+```
+
+### 2. GitHub Pages Frontend
+1. Push `docs/` folder to GitHub repository
+2. Go to Repository Settings → Pages
+3. Source: Deploy from branch `main`
+4. Folder: `/docs`
+5. Your demo will be live at: `https://yourusername.github.io/repo-name/`
+
+## 🛠️ Installation
+
+### Requirements
+```bash
+pip install -r requirements.txt
+```
+
+### Environment Variables
+```bash
+OPENAI_API_KEY=your_openai_key
+ELEVENLABS_API_KEY=your_elevenlabs_key
+DATABASE_URL=your_postgres_url
+```
+
+### Development
+```bash
+python main.py
+# Server runs on http://localhost:8000
+```
+
+## 🔧 Configuration
+
+### Voice Settings
+- Professional, Casual, Energetic, Calm styles
+- Duration: 60s, 90s, 2min, 3min options
+- Multi-language support
+
+### AI Services
+- Content extraction and analysis
+- Script optimization for virality
+- Natural voice generation
+- Smart video composition
+
+## 📊 API Usage
+
+### Generate Video
+```javascript
+POST /api/process
+{
+    "url": "https://example.com/article",
+    "content_type": "url",
+    "use_ai": true,
+    "settings": {
+        "duration": 60,
+        "voice_style": "professional",
+        "language": "en"
+    }
+}
+```
+
+### Check Status
+```javascript
+GET /api/job/{job_id}
+```
+
+## 🔍 Troubleshooting
+
+### CORS Issues
+- Use hosted demo instead of local files
+- Ensure Railway deployment is updated
+- Check browser console for detailed errors
+
+### API Connection
+- Verify Railway service is running
+- Check environment variables
+- Test with `/health` endpoint first
+
+## 📈 Monitoring
+
+- Real-time job progress tracking
+- Server health checks
+- AI service status monitoring
+- Error logging and debugging
+
+---
+Created with ❤️ for content creators who want to automate TikTok video production. 
