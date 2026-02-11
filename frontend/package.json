@@ -21,7 +21,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "tailwind-merge": "^2.0.0",
-    "axios": "^1.6.2",
+    "axios": "^1.13.5",
     "lucide-react": "^0.295.0"
   },
   "devDependencies": {
